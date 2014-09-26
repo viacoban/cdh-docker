@@ -1,0 +1,62 @@
+#RUN apt-get update
+#RUN apt-get -y install curl wget ntp apt-utils
+
+COPY install-jdk.sh install-jdk.sh
+RUN ["/bin/bash", "install-jdk.sh"]
+
+ENV JAVA_HOME /usr/java/default
+ENV PATH $JAVA_HOME/bin:$PATH
+
+COPY cloudera4.list /etc/apt/sources.list.d/
+RUN curl -s http://archive.cloudera.com/cdh4/ubuntu/precise/amd64/cdh/archive.key | apt-key add -
+
+RUN apt-get update
+
+RUN mkdir -p /hdfs
+RUN chmod -R 1777 /hdfs
+
+COPY start-all.sh start-all.sh
+COPY hdfs-service.sh hdfs-service.sh
+COPY mapred-service.sh mapred-service.sh
+COPY hbase-service.sh hbase-service.sh
+
+RUN apt-get -y install hadoop-0.20-mapreduce-jobtracker
+RUN apt-get -y install hadoop-hdfs-namenode
+
+RUN apt-get -y install hadoop-0.20-mapreduce-tasktracker
+RUN apt-get -y install hadoop-hdfs-datanode
+
+RUN ["/bin/bash", "hdfs-service.sh", "stop"]
+
+COPY hadoop/conf/core-site.xml /etc/hadoop/conf/core-site.xml
+COPY hadoop/conf/hdfs-site.xml /etc/hadoop/conf/hdfs-site.xml
+COPY hadoop/conf/mapred-site.xml /etc/hadoop/conf/mapred-site.xml
+
+RUN hdfs namenode -format -nonInteractive -force
+
+RUN ["/bin/bash", "hdfs-service.sh", "start"]
+#wait for namenode to get out of safe mode
+RUN echo "waiting for namenode to get out of safe-mode..." && sleep 35
+
+# hdfs common dirs
+RUN hdfs dfs -mkdir /user
+RUN hdfs dfs -chmod -R 1777 /user
+
+RUN hdfs dfs -mkdir /data/tr
+RUN hdfs dfs -chmod -R 1777 /data
+
+#RUN ["/bin/bash", "mapred-service.sh", "start"]
+
+# hbase
+#RUN apt-get -y install hbase hbase-master hbase-regionserver
+
+#COPY hbase /etc/
+
+#RUN ["/bin/bash", "hbase-service.sh", "start"]
+
+CMD ["/bin/bash", "start-all.sh"]
+
+EXPOSE 2181 2888 3888
+EXPOSE 8020 8021
+EXPOSE 50010 50020 50030 50060 50070 50075
+EXPOSE 60000 60010 60020 60030

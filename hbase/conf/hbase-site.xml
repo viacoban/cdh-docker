@@ -3,18 +3,10 @@
 <configuration>
   <property>
     <name>hbase.rootdir</name>
-    <value>hdfs://localhost:8020/hbase</value>
-  </property>
-  <property>
-    <name>hbase.cluster.distributed</name>
-    <value>true</value>
+    <value>/var/hdfs/hbase</value>
   </property>
   <property>
     <name>hbase.regionserver.codecs</name>
     <value>snappy</value>
-  </property>
-  <property>
-    <name>hbase.zookeeper.quorum</name>
-    <value>localhost</value>
   </property>
 </configuration>

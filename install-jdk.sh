@@ -14,6 +14,6 @@ if [ ! -d jdk1.7.0_67 ]; then
   tar xzvf jdk-7u67-linux-x64.tar.gz
 fi
 
-ln -sfn /usr/java/jdk.1.7.0_67 /usr/java/default
+ln -sfn /usr/java/jdk1.7.0_67 /usr/java/default
 
 popd

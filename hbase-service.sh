@@ -4,5 +4,8 @@ action=${1:-"action required"}
 
 for s in /etc/init.d/hbase-*
 do
-    service $(basename $s) start
+  echo "starting $s"
+  service $(basename $s) start
 done
+
+exit 0

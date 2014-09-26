@@ -4,5 +4,8 @@ action=${1:-"action required"}
 
 for s in /etc/init.d/hadoop-0.20-mapreduce-*
 do
-    service $(basename $s) ${action}
+  echo "starting $s"
+  service $(basename $s) ${action}
 done
+
+exit 0
